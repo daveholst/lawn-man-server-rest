@@ -2,19 +2,25 @@ const fastify = require('fastify')({
   logger:true
 })
 
+const db = require('./config/dbConfig');
+
 const PORT = process.env.PORT || 3001;
 
 // fastify.get('/', async (request, reply) => {
 //   return {message: test}
 // })
 
-fastify.register(require('./routes/user/user'))
+fastify.register(require('./routes/user'), {prefix: '/api/user'})
 
 
-fastify.listen(PORT, function (err, address) {
-  if (err) {
-    fastify.log.error(err)
-    process.exit(1)
+const start = async () => {
+  try {
+    await db.once('open', () => fastify.log.info('connected to database '))
+    await fastify.listen(PORT)
+    // fastify.log.info(`server is running at ${address}`)
+  } catch (error) {
+    fastify.log.error(error)
   }
-  fastify.log.info(`server listening on ${address}`)
-})
+}
+
+start()
