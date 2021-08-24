@@ -8,16 +8,13 @@ const PORT = process.env.PORT || 3001;
 //   return {message: test}
 // })
 
-fastify.register(require('./routes/index'))
+fastify.register(require('./routes/user/user'))
 
 
-const start = async () => {
-  try {
-    await fastify.listen(PORT)
-    fastify.log.info(`server is running at ${address}`)
-  } catch (error) {
-    fastify.log.error(error)
+fastify.listen(PORT, function (err, address) {
+  if (err) {
+    fastify.log.error(err)
+    process.exit(1)
   }
-}
-
-start()
+  fastify.log.info(`server listening on ${address}`)
+})
