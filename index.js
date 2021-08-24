@@ -11,13 +11,17 @@ const PORT = process.env.PORT || 3001;
 // })
 
 fastify
+  .register(require('fastify-cors'), {
+    origin: true
+  })
   .register(require('./routes/user'), { prefix: '/api/user' })
   .register(require('fastify-jwt'), {
     secret: 'supersecret',
     sign: {
-      expiersIn: "10h"
+      expiresIn: "10h"
     }
   })
+
 
 
 const start = async () => {
