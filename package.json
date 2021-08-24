@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/daveholst/lawn-man-server-rest#readme",
   "dependencies": {
+    "dotenv": "^10.0.0",
     "fastify": "^3.20.2",
     "mongoose": "^5.13.7"
   },
