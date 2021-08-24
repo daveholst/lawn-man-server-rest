@@ -10,7 +10,14 @@ const PORT = process.env.PORT || 3001;
 //   return {message: test}
 // })
 
-fastify.register(require('./routes/user'), {prefix: '/api/user'})
+fastify
+  .register(require('./routes/user'), { prefix: '/api/user' })
+  .register(require('fastify-jwt'), {
+    secret: 'supersecret',
+    sign: {
+      expiersIn: "10h"
+    }
+  })
 
 
 const start = async () => {
