@@ -43,6 +43,7 @@ module.exports = async function (fastify, options) {
   async function signUpHandler(request, reply) {
     try {
       const newUserData = request.body;
+      console.log(newUserData);
       const user = await User.create(newUserData);
       const { email, _id } = user;
       const token = await fastify.jwt.sign({ email, _id });
