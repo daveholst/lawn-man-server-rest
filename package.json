@@ -18,6 +18,11 @@
     "url": "https://github.com/daveholst/lawn-man-server-rest/issues"
   },
   "homepage": "https://github.com/daveholst/lawn-man-server-rest#readme",
+  "eslintConfig": {
+    "extends": [
+      "wesbos"
+    ]
+  },
   "dependencies": {
     "bcrypt": "^5.0.1",
     "dotenv": "^10.0.0",
@@ -29,6 +34,18 @@
     "mongoose": "^5.13.7"
   },
   "devDependencies": {
-    "nodemon": "^2.0.12"
+    "babel-eslint": "^10.1.0",
+    "eslint": "^7.32.0",
+    "eslint-config-airbnb": "^18.2.1",
+    "eslint-config-prettier": "^6.15.0",
+    "eslint-config-wesbos": "^1.0.1",
+    "eslint-plugin-html": "^6.1.2",
+    "eslint-plugin-import": "^2.24.2",
+    "eslint-plugin-jsx-a11y": "^6.4.1",
+    "eslint-plugin-prettier": "^3.4.1",
+    "eslint-plugin-react": "^7.24.0",
+    "eslint-plugin-react-hooks": "^4.2.0",
+    "nodemon": "^2.0.12",
+    "prettier": "^2.3.2"
   }
 }

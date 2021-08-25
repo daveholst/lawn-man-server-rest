@@ -1,6 +1,6 @@
 const fastify = require('fastify')({
-  logger:true
-})
+  logger: true,
+});
 
 const db = require('./config/dbConfig');
 
@@ -12,26 +12,24 @@ const PORT = process.env.PORT || 3001;
 
 fastify
   .register(require('fastify-cors'), {
-    origin: true
+    origin: true,
   })
   .register(require('./routes/user'), { prefix: '/api/user' })
   .register(require('fastify-jwt'), {
     secret: 'supersecret',
     sign: {
-      expiresIn: "10h"
-    }
-  })
-
-
+      expiresIn: '10h',
+    },
+  });
 
 const start = async () => {
   try {
-    await db.once('open', () => fastify.log.info('connected to database '))
-    await fastify.listen(PORT)
+    await db.once('open', () => fastify.log.info('connected to database '));
+    await fastify.listen(PORT);
     // fastify.log.info(`server is running at ${address}`)
   } catch (error) {
-    fastify.log.error(error)
+    fastify.log.error(error);
   }
-}
+};
 
-start()
+start();
