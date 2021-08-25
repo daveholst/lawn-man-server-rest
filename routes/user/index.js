@@ -3,7 +3,6 @@ const { User } = require('../../models');
 module.exports = async function (fastify, options) {
   async function loginHandler(request, reply) {
     const { password: loginPassword, email: loginEmail } = request.body;
-    console.log(request.body);
     try {
       const user = await User.findOne({ email: loginEmail });
       const { email, _id } = user;
@@ -17,8 +16,7 @@ module.exports = async function (fastify, options) {
         reply.send(new Error('Wrong Password'));
       }
 
-      // const token = fastify.jwt.sign()
-      const token = fastify.jwt.sign({ email, _id });
+      const token = await fastify.jwt.sign({ email, _id });
       return {
         user,
         token,
@@ -29,17 +27,36 @@ module.exports = async function (fastify, options) {
   }
 
   async function getMeHandler(request, reply) {
-    // check token
-    const isValidToken = await request.jwtVerify();
-    console.log(isValidToken);
+    try {
+      const validToken = await request.jwtVerify();
 
-    if (isValidToken) {
-      const result = await User.findOne({ _id: isValidToken._id });
-      console.log(result);
-      return result;
+      if (validToken) {
+        const result = await User.findOne({ _id: validToken._id });
+        return result;
+      }
+      throw fastify.httpErrors.unauthorized();
+    } catch (e) {
+      fastify.log.error(e);
+    }
+  }
+
+  async function signUpHandler(request, reply) {
+    try {
+      const newUserData = request.body;
+      const user = await User.create(newUserData);
+      const { email, _id } = user;
+      const token = await fastify.jwt.sign({ email, _id });
+      return {
+        user,
+        token,
+      };
+    } catch (e) {
+      fastify.log.error(e);
+      throw fastify.httpErrors.badRequest(e);
     }
   }
 
   fastify.post('/login', loginHandler);
+  fastify.post('/signup', signUpHandler);
   fastify.get('/me', getMeHandler);
 };

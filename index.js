@@ -20,7 +20,8 @@ fastify
     sign: {
       expiresIn: '10h',
     },
-  });
+  })
+  .register(require('fastify-sensible'));
 
 const start = async () => {
   try {
