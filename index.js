@@ -13,6 +13,7 @@ const PORT = process.env.PORT || 3001;
 fastify
   .register(require('fastify-cors'), {
     origin: '*',
+    methods: ['POST', 'PUT', 'GET'],
   })
   .register(require('./routes/user'), { prefix: '/api/user' })
   .register(require('fastify-jwt'), {
