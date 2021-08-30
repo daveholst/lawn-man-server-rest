@@ -43,7 +43,6 @@ module.exports = async function (fastify, options) {
   async function signUpHandler(request, reply) {
     try {
       const newUserData = request.body;
-      console.log(newUserData);
       const user = await User.create(newUserData);
       const { email, _id } = user;
       const token = await fastify.jwt.sign({ email, _id });
@@ -57,7 +56,31 @@ module.exports = async function (fastify, options) {
     }
   }
 
+  async function addPropertyHandler(request, reply) {
+    try {
+      const newPropertyData = request.body;
+      const validToken = await request.jwtVerify();
+      if (validToken) {
+        const user = await User.findOneAndUpdate(
+          { _id: validToken._id },
+          { $addToSet: { properties: newPropertyData } },
+          { new: true, runValidators: true }
+        );
+        const { email, _id } = user;
+        const token = await fastify.jwt.sign({ email, _id });
+        return {
+          user,
+          token,
+        };
+      }
+      throw fastify.httpErrors.unauthorized();
+    } catch (e) {
+      fastify.log.error(e);
+    }
+  }
+
+  fastify.get('/me', getMeHandler);
   fastify.post('/login', loginHandler);
   fastify.post('/signup', signUpHandler);
-  fastify.get('/me', getMeHandler);
+  fastify.post('/property', addPropertyHandler);
 };
