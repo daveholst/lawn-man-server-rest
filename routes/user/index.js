@@ -96,7 +96,38 @@ module.exports = async function (fastify, options) {
         );
         const { email, _id } = user;
         const token = await fastify.jwt.sign({ email, _id });
+        return { token, user };
       }
+      throw fastify.httpErrors.unauthorized();
+    } catch (e) {
+      fastify.log.error(e);
+    }
+  }
+
+  async function editZoneHandler(request, reply) {
+    try {
+      const newZoneData = request.body;
+      console.log(newZoneData);
+      const validToken = await request.jwtVerify();
+      if (validToken) {
+        const user = await User.findOneAndUpdate(
+          {
+            _id: validToken._id,
+          },
+          { $set: { 'properties.$[e1].zones.$[e2]': newZoneData.zoneData } },
+          {
+            arrayFilters: [
+              { 'e1.propertyName': newZoneData.propertyName },
+              { 'e2._id': newZoneData.zoneId },
+            ],
+          }
+        );
+        const { email, _id } = user;
+        const token = await fastify.jwt.sign({ email, _id });
+        return { token, user };
+      }
+
+      throw fastify.httpErrors.unauthorized();
     } catch (e) {
       fastify.log.error(e);
     }
@@ -107,4 +138,5 @@ module.exports = async function (fastify, options) {
   fastify.post('/signup', signUpHandler);
   fastify.post('/property', addPropertyHandler);
   fastify.post('/zones', addZonesHandler);
+  fastify.put('/zones', editZoneHandler);
 };
