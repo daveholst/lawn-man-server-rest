@@ -107,7 +107,6 @@ module.exports = async function (fastify, options) {
   async function editZoneHandler(request, reply) {
     try {
       const newZoneData = request.body;
-      console.log(newZoneData);
       const validToken = await request.jwtVerify();
       if (validToken) {
         const user = await User.findOneAndUpdate(
