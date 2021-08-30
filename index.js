@@ -27,7 +27,7 @@ fastify
 const start = async () => {
   try {
     await db.once('open', () => fastify.log.info('connected to database '));
-    await fastify.listen(PORT);
+    await fastify.listen(PORT, 'localhost');
     // fastify.log.info(`server is running at ${address}`)
   } catch (error) {
     fastify.log.error(error);
