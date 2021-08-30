@@ -79,8 +79,32 @@ module.exports = async function (fastify, options) {
     }
   }
 
+  async function addZonesHandler(request, reply) {
+    try {
+      const newZoneData = request.body;
+      const validToken = await request.jwtVerify();
+      if (validToken) {
+        const user = await User.findOneAndUpdate(
+          {
+            $and: [
+              { _id: validToken._id },
+              { 'properties.propertyName': newZoneData.propertyName },
+            ],
+          },
+          { $addToSet: { 'properties.$.zones': { $each: newZoneData.zones } } },
+          { new: true, runValidators: true }
+        );
+        const { email, _id } = user;
+        const token = await fastify.jwt.sign({ email, _id });
+      }
+    } catch (e) {
+      fastify.log.error(e);
+    }
+  }
+
   fastify.get('/me', getMeHandler);
   fastify.post('/login', loginHandler);
   fastify.post('/signup', signUpHandler);
   fastify.post('/property', addPropertyHandler);
+  fastify.post('/zones', addZonesHandler);
 };
