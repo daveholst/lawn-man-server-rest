@@ -23,7 +23,9 @@ fastify
   })
   .register(require('./routes/user'), { prefix: '/api/user' })
   .register(require('./routes/fertiliser'), { prefix: '/api/fert' })
+  .register(require('./routes/prog'), { prefix: '/api/prog' })
   .register(require('fastify-jwt'), {
+    // TODO move this out to a ENV variable
     secret: 'supersecret',
     sign: {
       expiresIn: '10h',
