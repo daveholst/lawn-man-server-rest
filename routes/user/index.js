@@ -5,17 +5,19 @@ module.exports = async function (fastify, options) {
     const { password: loginPassword, email: loginEmail } = request.body;
     try {
       const user = await User.findOne({ email: loginEmail });
-      const { email, _id } = user;
 
       if (!user) {
         reply.send(new Error('No user with that email!'));
+        return;
       }
 
       const isPwCorrect = await user.isCorrectPassword(loginPassword);
       if (!isPwCorrect) {
         reply.send(new Error('Wrong Password'));
+        return;
       }
 
+      const { email, _id } = user;
       const token = await fastify.jwt.sign({ email, _id });
       return {
         user,
@@ -60,21 +62,20 @@ module.exports = async function (fastify, options) {
     try {
       const newPropertyData = request.body;
       const validToken = await request.jwtVerify();
-      if (validToken) {
-        const user = await User.findOneAndUpdate(
-          { _id: validToken._id },
-          { $addToSet: { properties: newPropertyData } },
-          { new: true, runValidators: true }
-        );
-        const { email, _id } = user;
-        const token = await fastify.jwt.sign({ email, _id });
-        return {
-          user,
-          token,
-        };
-      }
-      throw fastify.httpErrors.unauthorized();
+
+      const user = await User.findOneAndUpdate(
+        { _id: validToken._id },
+        { $addToSet: { properties: newPropertyData } },
+        { new: true, runValidators: true }
+      );
+      const { email, _id } = user;
+      const token = await fastify.jwt.sign({ email, _id });
+      return {
+        user,
+        token,
+      };
     } catch (e) {
+      reply.send(e);
       fastify.log.error(e);
     }
   }
@@ -83,23 +84,22 @@ module.exports = async function (fastify, options) {
     try {
       const newZoneData = request.body;
       const validToken = await request.jwtVerify();
-      if (validToken) {
-        const user = await User.findOneAndUpdate(
-          {
-            $and: [
-              { _id: validToken._id },
-              { 'properties.propertyName': newZoneData.propertyName },
-            ],
-          },
-          { $addToSet: { 'properties.$.zones': { $each: newZoneData.zones } } },
-          { new: true, runValidators: true }
-        );
-        const { email, _id } = user;
-        const token = await fastify.jwt.sign({ email, _id });
-        return { token, user };
-      }
-      throw fastify.httpErrors.unauthorized();
+
+      const user = await User.findOneAndUpdate(
+        {
+          $and: [
+            { _id: validToken._id },
+            { 'properties.propertyName': newZoneData.propertyName },
+          ],
+        },
+        { $addToSet: { 'properties.$.zones': { $each: newZoneData.zones } } },
+        { new: true, runValidators: true }
+      );
+      const { email, _id } = user;
+      const token = await fastify.jwt.sign({ email, _id });
+      return { token, user };
     } catch (e) {
+      reply.send(e);
       fastify.log.error(e);
     }
   }
@@ -108,26 +108,24 @@ module.exports = async function (fastify, options) {
     try {
       const newZoneData = request.body;
       const validToken = await request.jwtVerify();
-      if (validToken) {
-        const user = await User.findOneAndUpdate(
-          {
-            _id: validToken._id,
-          },
-          { $set: { 'properties.$[e1].zones.$[e2]': newZoneData.zoneData } },
-          {
-            arrayFilters: [
-              { 'e1.propertyName': newZoneData.propertyName },
-              { 'e2._id': newZoneData.zoneId },
-            ],
-          }
-        );
-        const { email, _id } = user;
-        const token = await fastify.jwt.sign({ email, _id });
-        return { token, user };
-      }
 
-      throw fastify.httpErrors.unauthorized();
+      const user = await User.findOneAndUpdate(
+        {
+          _id: validToken._id,
+        },
+        { $set: { 'properties.$[e1].zones.$[e2]': newZoneData.zoneData } },
+        {
+          arrayFilters: [
+            { 'e1.propertyName': newZoneData.propertyName },
+            { 'e2._id': newZoneData.zoneId },
+          ],
+        }
+      );
+      const { email, _id } = user;
+      const token = await fastify.jwt.sign({ email, _id });
+      return { token, user };
     } catch (e) {
+      reply.send(e);
       fastify.log.error(e);
     }
   }

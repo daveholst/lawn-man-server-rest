@@ -1,6 +1,10 @@
 const fastify = require('fastify')({
   logger: {
-    prettyPrint: true,
+    prettyPrint: {
+      translateTime: true,
+      ignore: 'pid,hostname,reqId,responseTime,req,res',
+      messageFormat: '{msg} [id={reqId} {req.method} {req.url}]',
+    },
   },
 });
 
@@ -18,6 +22,7 @@ fastify
     methods: ['POST', 'PUT', 'GET', 'DELETE', 'OPTIONS'],
   })
   .register(require('./routes/user'), { prefix: '/api/user' })
+  .register(require('./routes/fertiliser'), { prefix: '/api/fert' })
   .register(require('fastify-jwt'), {
     secret: 'supersecret',
     sign: {
