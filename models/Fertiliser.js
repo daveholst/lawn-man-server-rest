@@ -11,12 +11,14 @@ const fertiliserSchema = new Schema({
   },
   type: {
     type: String,
+    required: true,
   },
   description: {
     type: String,
   },
   applicationRate: {
     type: String,
+    required: true,
   },
   manufacturerLink: {
     type: String,
