@@ -18,7 +18,11 @@ const fertiliserSchema = new Schema({
   },
   applicationRate: {
     type: String,
-    required: true,
+    required: false,
+  },
+  applicationRatePlant: {
+    type: String,
+    required: false,
   },
   manufacturerLink: {
     type: String,
