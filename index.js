@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const fastify = require('fastify')({
   logger: {
     prettyPrint: {
@@ -9,12 +11,15 @@ const fastify = require('fastify')({
 });
 
 const db = require('./config/dbConfig');
+const { mqttClient } = require('./utils/mqtt');
 
 const PORT = process.env.PORT || 3001;
 
 // fastify.get('/', async (request, reply) => {
 //   return {message: test}
 // })
+
+// start mqtt client
 
 fastify
   .register(require('fastify-cors'), {
@@ -36,7 +41,8 @@ fastify
 const start = async () => {
   try {
     await db.once('open', () => fastify.log.info('connected to database '));
-    await fastify.listen(PORT, '0.0.0.0');
+    // await fastify.listen(PORT, '0.0.0.0');
+    await fastify.listen(PORT);
     // fastify.log.info(`server is running at ${address}`)
   } catch (error) {
     fastify.log.error(error);

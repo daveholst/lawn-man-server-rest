@@ -5,6 +5,7 @@
 // openSprinler -> stop watering
 const axios = require('axios').default;
 const mqtt = require('mqtt');
+const { juiceBoxStatus } = require('./mqtt');
 
 const stationConverter = (stnCount, stationNum, time) => {
   // build array
@@ -54,10 +55,17 @@ const runManualProgram = async ({ property, stationNumber, fertRuntime }) => {
     console.error(error);
   }
   // set turn off after set time.
-  // switch the valve back
-  setTimeout(() => {
-    mqttClient.publish(`${property.juiceBoxId}/relay1`, 'off');
-  }, (Number(fertRuntime) - 360) * 1000);
+  // switch the valve back when below 1L
+  const intervalID = setInterval(() => {
+    if (juiceBoxStatus.tankWeight < 1500) {
+      clearInterval(intervalID);
+      mqttClient.publish(`${property.juiceBoxId}/relay1`, 'off');
+    }
+  }, 500);
+
+  // setTimeout(() => {
+  //   mqttClient.publish(`${property.juiceBoxId}/relay1`, 'off');
+  // }, (Number(fertRuntime) - 360) * 1000);
 };
 
 module.exports = runManualProgram;

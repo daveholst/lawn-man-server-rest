@@ -1,4 +1,5 @@
 const runManualProgram = require('../../utils/runManualProg');
+const runManualFill = require('../../utils/fillTank');
 const { User } = require('../../models');
 
 module.exports = async function (fastify, options) {
@@ -27,6 +28,22 @@ module.exports = async function (fastify, options) {
       fastify.log.error(e);
     }
   }
+  async function runManualFillHandler(request, reply) {
+    fastify.log.info(request.body);
+    try {
+      const validToken = await request.jwtVerify();
+      if (validToken) {
+        const { quantity } = request.body;
+        const target = runManualFill(quantity);
+
+        reply.send({ target });
+      }
+    } catch (e) {
+      reply.send(e);
+      fastify.log.error(e);
+    }
+  }
   // routes
   fastify.post('/manual', runManualProgramHandler);
+  fastify.post('/fill', runManualFillHandler);
 };
