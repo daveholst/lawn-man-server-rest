@@ -1,6 +1,8 @@
 const mqttClient = require('../config/mqttConfig');
 
+// TODO get most recent stats from the db?
 const juiceBoxStatus = {
+  lastKnownWeight: 0,
   rawTankWeight: 0,
   calibrationOffset: 0,
   calibratedTankWeight() {
@@ -8,6 +10,35 @@ const juiceBoxStatus = {
   },
   flowRate: 0,
   lastUpdated: Date.now(),
+  fertigationBypass: false,
+  fillSolenoid: false,
+  fertigating: false,
+  filling: false,
+  fertilisers: {
+    fert1: {
+      type: '',
+      target: 0,
+      amountInTank: 0,
+      inTank: false,
+    },
+    fert2: {
+      type: '',
+      target: 0,
+      amountInTank: 0,
+      inTank: false,
+    },
+    fert3: {
+      type: '',
+      target: 0,
+      amountInTank: 0,
+      inTank: false,
+    },
+  },
+  pump1: {
+    type: '',
+    amountRemaining: 0,
+    pumpRunning: false,
+  },
 };
 
 const flowValues = [];
@@ -53,11 +84,13 @@ mqttClient.on('message', (topic, msg) => {
   if (topic === 'juicebox1/tankWeight') {
     juiceBoxStatus.rawTankWeight = Number(msgString);
     juiceBoxStatus.lastUpdated = Date.now();
-    console.log(
-      'flow calc',
-      flowCalculator(juiceBoxStatus.rawTankWeight),
-      'mL / min'
-    );
+    const calculatedFlow = flowCalculator(juiceBoxStatus.rawTankWeight);
+    if (calculatedFlow < -250 || calculatedFlow > 250) {
+      juiceBoxStatus.flowRate = calculatedFlow;
+    } else {
+      juiceBoxStatus.flowRate = 0;
+    }
+    console.log('flow calc', juiceBoxStatus.flowRate, 'mL / min');
   }
 });
 
