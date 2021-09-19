@@ -15,14 +15,15 @@ function borePumpOn(time) {
 }
 
 function fillTank(waterQty) {
-  const targetWeight = juiceBoxStatus.tankWeight + waterQty;
+  console.log(juiceBoxStatus.calibratedTankWeight);
+  const targetWeight = juiceBoxStatus.calibratedTankWeight() + waterQty;
   console.log(targetWeight);
   // start listening/ sub to changes in tankWeight
   borePumpOn('300'); // bore pump on for 60seconds??
   mqttClient.publish('juicebox1/relay2', 'on');
 
   const intID = setInterval(() => {
-    if (juiceBoxStatus.tankWeight > targetWeight) {
+    if (juiceBoxStatus.calibratedTankWeight() > targetWeight) {
       // stop valves
       mqttClient.publish('juicebox1/relay2', 'off');
       borePumpOn('0'); // bore pump on for 60seconds??

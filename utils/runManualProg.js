@@ -59,7 +59,7 @@ const runManualProgram = async ({ property, stationNumber, fertRuntime }) => {
   // set turn off after set time.
   // switch the valve back when below 1L
   const intervalID = setInterval(() => {
-    if (juiceBoxStatus.rawTankWeight < 2000) {
+    if (juiceBoxStatus.calibratedTankWeight < 2000) {
       clearInterval(intervalID);
       mqttClient.publish(`${property.juiceBoxId}/relay1`, 'off');
     }
