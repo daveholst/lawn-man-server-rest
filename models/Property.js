@@ -1,5 +1,6 @@
 const { Schema } = require('mongoose');
 const zoneSchema = require('./Zone');
+const historySchema = require('./History');
 
 const propertySchema = new Schema({
   propertyName: {
@@ -14,6 +15,15 @@ const propertySchema = new Schema({
     type: String,
     required: true,
   },
+  lastJuiceBoxRawVolume: {
+    type: Number,
+    required: false,
+  },
+  lastRecordedVolumeTime: {
+    type: Date,
+    required: false,
+  },
+  juiceBoxHistory: [historySchema],
   openSprinklerAddress: {
     type: String,
     required: true,

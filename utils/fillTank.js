@@ -1,7 +1,7 @@
 const axios = require('axios').default;
 // const mqttClient = require('./mqtt');
-
-const { juiceBoxStatus, mqttClient } = require('./mqtt');
+const mqttClient = require('../config/mqttConfig');
+const { juiceBoxStatus } = require('./juiceBoxStatus');
 
 // TODO this is hardcoded :(
 

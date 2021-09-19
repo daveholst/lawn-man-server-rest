@@ -40,8 +40,9 @@ fastify
 const start = async () => {
   try {
     await db.once('open', () => fastify.log.info('connected to database '));
-    await fastify.listen(PORT, '0.0.0.0');
-    // await fastify.listen(PORT);
+    // TODO: Automate this for local dev env.?? use the .env?
+    // await fastify.listen(PORT, '0.0.0.0');
+    await fastify.listen(PORT);
     // fastify.log.info(`server is running at ${address}`)
   } catch (error) {
     fastify.log.error(error);

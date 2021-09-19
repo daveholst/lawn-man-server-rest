@@ -4,8 +4,8 @@
 // juiceBox -> Change dilvery back to bore
 // openSprinler -> stop watering
 const axios = require('axios').default;
-const mqtt = require('mqtt');
-const { juiceBoxStatus } = require('./mqtt');
+const mqttClient = require('../config/mqttConfig');
+const { juiceBoxStatus } = require('./juiceBoxStatus');
 
 const stationConverter = (stnCount, stationNum, time) => {
   // build array
@@ -16,15 +16,16 @@ const stationConverter = (stnCount, stationNum, time) => {
 };
 
 const runManualProgram = async ({ property, stationNumber, fertRuntime }) => {
-  // change master valve to juicebox
+  // tare/calibrate scales from last known weight (from db)
+
   // setup mqtt client
-  const mqttClient = mqtt.connect(
-    process.env.MQTTSERVER || 'mqtt://10.104.0.3',
-    {
-      username: process.env.MQTTUSR,
-      password: process.env.MQTTPWD,
-    }
-  );
+  // const mqttClient = mqtt.connect(
+  //   process.env.MQTTSERVER || 'mqtt://10.104.0.3',
+  //   {
+  //     username: process.env.MQTTUSR,
+  //     password: process.env.MQTTPWD,
+  //   }
+  // );
 
   mqttClient.on('connect', () => {
     mqttClient.subscribe(`${property.juiceBoxId}/#`, (err) => {
@@ -33,6 +34,7 @@ const runManualProgram = async ({ property, stationNumber, fertRuntime }) => {
       }
     });
   });
+  //
 
   // switch the valve to juicebox
   mqttClient.publish(`${property.juiceBoxId}/relay1`, 'on');
@@ -57,7 +59,7 @@ const runManualProgram = async ({ property, stationNumber, fertRuntime }) => {
   // set turn off after set time.
   // switch the valve back when below 1L
   const intervalID = setInterval(() => {
-    if (juiceBoxStatus.tankWeight < 2000) {
+    if (juiceBoxStatus.rawTankWeight < 2000) {
       clearInterval(intervalID);
       mqttClient.publish(`${property.juiceBoxId}/relay1`, 'off');
     }
